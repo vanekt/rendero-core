@@ -1,5 +1,5 @@
 {
-  "name": "rendero-core",
+  "name": "@vanekt/rendero-core",
   "version": "1.0.1",
   "author": "vanekt",
   "license": "MIT",
@@ -19,5 +19,6 @@
   },
   "dependencies": {
     "lodash": "^4.17.21"
-  }
+  },
+  "description": ""
 }
