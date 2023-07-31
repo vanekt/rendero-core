@@ -8,6 +8,6 @@ build:
 	yarn build
 
 publish:
-	yarn publish
+	yarn publish --access public
 
 release: clean lint build publish
