@@ -1,4 +1,6 @@
-import { bindEvents, replacePlaceholders } from "./helpers";
+import { bindEvents, replacePlaceholders, bindFunction } from "./helpers";
+
+export { bindFunction };
 
 export function createInstance(...modules) {
   const COMPONENTS = modules.reduce(
@@ -14,12 +16,12 @@ export function createInstance(...modules) {
     },
     {
       __legacy: {},
-    },
+    }
   );
 
   const VARS = modules.reduce(
     (result, { vars = {} }) => ({ ...result, ...vars }),
-    {},
+    {}
   );
 
   const render = (node = {}, _vars = {}) => {
@@ -51,11 +53,11 @@ export function createInstance(...modules) {
           }
 
           return children.map((child, idx) =>
-            render({ ...child, key: idx }, { ..._vars, ...__vars }),
+            render({ ...child, key: idx }, { ..._vars, ...__vars })
           );
         },
         replacePlaceholders,
-      },
+      }
     );
   };
 
