@@ -32,12 +32,12 @@ function initMyModule() {
       hello: ({ value }) => `Hello, ${value || "World"}!`,
       div: createNode("div"),
       span: createNode("span"),
-      eval: ({ code }, { vars }) => {
+      eval: ({ code }) => {
         const node = document.createElement("script");
 
         node.textContent = `
           (function() {
-            new Function("vars", ${code})(${JSON.stringify(vars)});
+            new Function(${code})();
           })();
         `;
 
@@ -123,7 +123,7 @@ As a result, we will get the following HTML markup:
   "Hello, World!"
   <script>
   (function() {
-    new Function("vars", console.log("Hi, Rendero!"))({"name":"Rendero"});
+    new Function("vars", console.log("Hi, Rendero!"))();
   })();
   </script>
 </div>
