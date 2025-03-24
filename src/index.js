@@ -16,12 +16,12 @@ export function createInstance(...modules) {
     },
     {
       __legacy: {},
-    }
+    },
   );
 
   const VARS = modules.reduce(
     (result, { vars = {} }) => ({ ...result, ...vars }),
-    {}
+    {},
   );
 
   const render = (node = {}, _vars = {}) => {
@@ -53,11 +53,11 @@ export function createInstance(...modules) {
           }
 
           return children.map((child, idx) =>
-            render({ ...child, key: idx }, { ..._vars, ...__vars })
+            render({ ...child, key: idx }, { ..._vars, ...__vars }),
           );
         },
         replacePlaceholders,
-      }
+      },
     );
   };
 

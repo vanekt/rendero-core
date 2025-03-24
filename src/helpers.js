@@ -17,7 +17,7 @@ export function replacePlaceholders(object, values) {
     while (start >= 0) {
       let end = result.indexOf(
         PLACEHOLDER_END,
-        start + PLACEHOLDER_START.length
+        start + PLACEHOLDER_START.length,
       );
       if (end === -1) {
         break;
@@ -40,7 +40,7 @@ export function replacePlaceholders(object, values) {
 
           result = result.replace(
             `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`,
-            `${fnResult}`
+            `${fnResult}`,
           );
         } catch (e) {
           console.error("fnError", e);
@@ -59,7 +59,7 @@ export function replacePlaceholders(object, values) {
 
         result = result.replace(
           `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`,
-          `${value}`
+          `${value}`,
         );
       } else {
         result = result.replace(PLACEHOLDER_START, PLACEHOLDER_START_TEMP);

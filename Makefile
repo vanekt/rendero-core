@@ -4,10 +4,13 @@ clean:
 lint:
 	yarn lint
 
+test:
+	yarn test
+
 build:
 	yarn build
 
 publish:
 	yarn publish --access public
 
-release: clean lint build publish
+release: clean lint test build publish
