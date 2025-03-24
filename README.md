@@ -1,4 +1,4 @@
-# Rendero UI Library
+# Rendero UI Library ![npm version](https://img.shields.io/npm/v/@vanekt/rendero-core)
 
 A library for dynamic UI rendering based on mappers and JSON markup. It allows updating the UI without redeploying the frontend, making customization fast and flexible.
 
