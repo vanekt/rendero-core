@@ -116,6 +116,20 @@ document.body.appendChild(template);
 
 ```
 
+As a result, we will get the following HTML markup:
+```html
+<div key="0" id="my-div" title="My DIV" style="display: flex; flex-direction: column;">
+  <span key="0" style="color: red;">Hello, Universe!</span>
+  "Hello, World!"
+  <script>
+  (function() {
+    new Function("vars", console.log("Hi, Rendero!"))({"name":"Rendero"});
+  })();
+  </script>
+</div>
+```
+
+
 ## Ready-to-Use Modules
 
 You don’t have to start from scratch—there are already some ready-made modules you can use:
