@@ -16,27 +16,27 @@ afterEach(() => {
 });
 
 describe("replacePlaceholders function", () => {
-  test("it works with strings: placeholder {{color}} is replaced with 'red'", () => {
+  test("correctly replaces a string placeholder with its value", () => {
     expect(replacePlaceholders("{{color}}", placeholders)).toBe("red");
   });
 
-  test("it works with number: placeholder {{zIndex}} is replaced with 10", () => {
+  test("correctly replaces a numeric placeholder with its value", () => {
     expect(replacePlaceholders("{{zIndex}}", placeholders)).toBe(10);
   });
 
-  test("it works with arrays", () => {
+  test("replaces placeholders inside an array", () => {
     expect(
       replacePlaceholders(["{{color}}", "{{zIndex}}"], placeholders)
     ).toEqual(["red", 10]);
   });
 
-  test("it works with objects", () => {
+  test("replaces placeholders inside an object", () => {
     expect(
       replacePlaceholders({ title: "Color: {{color}}" }, placeholders)
     ).toEqual({ title: "Color: red" });
   });
 
-  test("it works with nested props", () => {
+  test("replaces placeholders inside a nested object", () => {
     expect(
       replacePlaceholders(
         {
@@ -47,13 +47,13 @@ describe("replacePlaceholders function", () => {
     ).toEqual({ metadata: { title: "Color: red", zIndex: 10 } });
   });
 
-  test("should be unmodified if there are no placeholders", () => {
+  test("does not modify the input if no placeholders", () => {
     expect(replacePlaceholders({ title: "Hello, {{name}}!" }, null)).toEqual({
       title: "Hello, {{name}}!",
     });
   });
 
-  test("should be unmodified if no matching placeholder is found", () => {
+  test("does not modify the input if no matching placeholder is found", () => {
     expect(
       replacePlaceholders({ title: "Hello, {{name}}!" }, { foo: "bar" })
     ).toEqual({
@@ -61,7 +61,7 @@ describe("replacePlaceholders function", () => {
     });
   });
 
-  test("it works with calculated placeholders", () => {
+  test("works with calculated placeholders", () => {
     expect(
       replacePlaceholders(
         "{{e! return 'Color: ' + color + ', opacity: '+ opacity; }}",
@@ -70,7 +70,7 @@ describe("replacePlaceholders function", () => {
     ).toBe("Color: red, opacity: 0.5");
   });
 
-  test("it works with functions", () => {
+  test("works with functions", () => {
     expect(replacePlaceholders("{{e! return fn()+fn(); }}", placeholders)).toBe(
       "successsuccess"
     );
@@ -78,7 +78,7 @@ describe("replacePlaceholders function", () => {
     expect(placeholders.fn.mock.results[1].value).toBe("success");
   });
 
-  test("it works with complex structire", () => {
+  test("works with complex structire", () => {
     expect(
       replacePlaceholders(
         {
@@ -119,5 +119,39 @@ describe("replacePlaceholders function", () => {
     });
 
     expect(placeholders.fn).toHaveBeenCalledTimes(1);
+  });
+
+  test("returns empty string if input is empty", () => {
+    expect(replacePlaceholders("", placeholders)).toBe("");
+  });
+
+  test("returns the same string if there are no placeholders in expression", () => {
+    expect(replacePlaceholders("Hello, world!", placeholders)).toBe(
+      "Hello, world!"
+    );
+  });
+
+  test("does not replace malformed placeholders", () => {
+    expect(replacePlaceholders("{color}}", placeholders)).toBe("{color}}");
+  });
+
+  test("does not replace placeholders with spaces inside", () => {
+    expect(replacePlaceholders("{{ color }}", placeholders)).toBe(
+      "{{ color }}"
+    );
+  });
+
+  test("leaves the expression unchanged if a variable is not found", () => {
+    expect(
+      replacePlaceholders("{{e! return unknownVar; }}", placeholders)
+    ).toBe("{{e! return unknownVar; }}");
+  });
+
+  test("returns null if input is null", () => {
+    expect(replacePlaceholders(null, placeholders)).toBe(null);
+  });
+
+  test("returns undefined if input is undefined", () => {
+    expect(replacePlaceholders(undefined, placeholders)).toBe(undefined);
   });
 });
