@@ -1,4 +1,4 @@
-# Rendero UI Library
+# Rendero UI Library ![npm version](https://img.shields.io/npm/v/@vanekt/rendero-core)
 
 A library for dynamic UI rendering based on mappers and JSON markup. It allows updating the UI without redeploying the frontend, making customization fast and flexible.
 
@@ -32,12 +32,12 @@ function initMyModule() {
       hello: ({ value }) => `Hello, ${value || "World"}!`,
       div: createNode("div"),
       span: createNode("span"),
-      eval: ({ code }, { vars }) => {
+      eval: ({ code }) => {
         const node = document.createElement("script");
 
         node.textContent = `
           (function() {
-            new Function("vars", ${code})(${JSON.stringify(vars)});
+            new Function(${code})();
           })();
         `;
 
@@ -115,6 +115,20 @@ const template = instance.render(json, placeholders);
 document.body.appendChild(template);
 
 ```
+
+As a result, we will get the following HTML markup:
+```html
+<div key="0" id="my-div" title="My DIV" style="display: flex; flex-direction: column;">
+  <span key="0" style="color: red;">Hello, Universe!</span>
+  "Hello, World!"
+  <script>
+  (function() {
+    new Function("vars", console.log("Hi, Rendero!"))();
+  })();
+  </script>
+</div>
+```
+
 
 ## Ready-to-Use Modules
 
