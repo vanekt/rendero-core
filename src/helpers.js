@@ -41,7 +41,7 @@ export function replacePlaceholders(object, values) {
             `${fnResult}`,
           );
         } catch (e) {
-          console.error("fnError", e);
+          // console.error("fnError", e);
           result = result.replace(PLACEHOLDER_START, PLACEHOLDER_START_TEMP);
           result = result.replace(PLACEHOLDER_END, PLACEHOLDER_END_TEMP);
         }

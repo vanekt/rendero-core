@@ -58,8 +58,8 @@ function createNode(name) {
       node.setAttributeNode(attr);
     });
 
-    const children = renderChildren() || [];
-    node.append(...children);
+    node.append(...renderChildren());
+
     return node;
   };
 }

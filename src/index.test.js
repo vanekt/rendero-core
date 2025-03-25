@@ -1,157 +1,181 @@
-import { jest, afterEach, describe, test, expect } from "@jest/globals";
-import { replacePlaceholders } from "./helpers";
+import { describe, test, expect } from "@jest/globals";
+import { createInstance } from ".";
 
-const placeholders = {
-  color: "red",
-  zIndex: 10,
-  disabled: true,
-  opacity: 0.5,
-  bigint: 10n,
-  array: [1, 2, 3],
-  fn: jest.fn(() => "success"),
-};
+function initMyModule() {
+  return {
+    name: "my",
+    components: {
+      hello: ({ value }) => `Hello, ${value || "World"}!`,
+      div: createNode("div"),
+      span: createNode("span"),
+      eval: ({ code }) => {
+        const node = document.createElement("script");
 
-afterEach(() => {
-  jest.clearAllMocks();
+        node.textContent = `
+          (function() {
+            new Function(${code})();
+          })();
+        `;
+
+        return node;
+      },
+    },
+    vars: {
+      one: 1,
+      two: 2,
+    },
+  };
+}
+
+function initSecondModule() {
+  return {
+    name: "second",
+    components: {
+      foo: () => "bar",
+    },
+    vars: {
+      foo: "bar",
+    },
+  };
+}
+
+function createNode(name) {
+  return (props, { renderChildren }) => {
+    const node = document.createElement(name);
+
+    Object.keys(props || {}).forEach((key) => {
+      const attr = document.createAttribute(key);
+      attr.value = props[key];
+      node.setAttributeNode(attr);
+    });
+
+    node.append(...renderChildren());
+
+    return node;
+  };
+}
+
+const myModule = initMyModule();
+const secondModule = initSecondModule();
+const instance = createInstance(myModule, secondModule);
+const placeholders = { name: "Rendero" };
+
+describe("instance.components", () => {
+  test("correctly add all modules", () => {
+    expect(instance.components).toHaveProperty(myModule.name);
+    expect(instance.components).toHaveProperty(secondModule.name);
+    expect(Object.keys(instance.components).length).toBe(2);
+  });
+
+  test(`correctly add "${myModule.name}" module all components`, () => {
+    expect(instance.components[myModule.name]).toHaveProperty("div");
+    expect(instance.components[myModule.name]).toHaveProperty("span");
+    expect(instance.components[myModule.name]).toHaveProperty("hello");
+    expect(instance.components[myModule.name]).toHaveProperty("eval");
+    expect(Object.keys(instance.components[myModule.name]).length).toBe(
+      Object.keys(myModule.components).length,
+    );
+  });
+
+  test(`correctly add "${secondModule.name}" module all components`, () => {
+    expect(instance.components[secondModule.name]).toHaveProperty("foo");
+    expect(Object.keys(instance.components[secondModule.name]).length).toBe(
+      Object.keys(secondModule.components).length,
+    );
+  });
 });
 
-describe("replacePlaceholders function", () => {
-  test("correctly replaces a string placeholder with its value", () => {
-    expect(replacePlaceholders("{{color}}", placeholders)).toBe("red");
+describe("instance.vars", () => {
+  test("correctly add all vars", () => {
+    expect(instance.vars).toHaveProperty("one");
+    expect(instance.vars).toHaveProperty("two");
+    expect(instance.vars).toHaveProperty("foo");
   });
+});
 
-  test("correctly replaces a numeric placeholder with its value", () => {
-    expect(replacePlaceholders("{{zIndex}}", placeholders)).toBe(10);
-  });
-
-  test("replaces placeholders inside an array", () => {
-    expect(
-      replacePlaceholders(["{{color}}", "{{zIndex}}"], placeholders)
-    ).toEqual(["red", 10]);
-  });
-
-  test("replaces placeholders inside an object", () => {
-    expect(
-      replacePlaceholders({ title: "Color: {{color}}" }, placeholders)
-    ).toEqual({ title: "Color: red" });
-  });
-
-  test("replaces placeholders inside a nested object", () => {
-    expect(
-      replacePlaceholders(
-        {
-          metadata: { title: "Color: {{color}}", zIndex: "{{zIndex}}" },
-        },
-        placeholders
-      )
-    ).toEqual({ metadata: { title: "Color: red", zIndex: 10 } });
-  });
-
-  test("does not modify the input if no placeholders", () => {
-    expect(replacePlaceholders({ title: "Hello, {{name}}!" }, null)).toEqual({
-      title: "Hello, {{name}}!",
-    });
-  });
-
-  test("does not modify the input if no matching placeholder is found", () => {
-    expect(
-      replacePlaceholders({ title: "Hello, {{name}}!" }, { foo: "bar" })
-    ).toEqual({
-      title: "Hello, {{name}}!",
-    });
-  });
-
-  test("works with calculated placeholders", () => {
-    expect(
-      replacePlaceholders(
-        "{{e! return 'Color: ' + color + ', opacity: '+ opacity; }}",
-        placeholders
-      )
-    ).toBe("Color: red, opacity: 0.5");
-  });
-
-  test("works with functions", () => {
-    expect(replacePlaceholders("{{e! return fn()+fn(); }}", placeholders)).toBe(
-      "successsuccess"
+describe("instance.render function", () => {
+  test("correctly render my.hello component", () => {
+    expect(instance.render({ module: "my", type: "hello" }, placeholders)).toBe(
+      "Hello, World!",
     );
-    expect(placeholders.fn).toHaveBeenCalledTimes(2);
-    expect(placeholders.fn.mock.results[1].value).toBe("success");
   });
 
-  test("works with complex structire", () => {
-    expect(
-      replacePlaceholders(
-        {
-          object: {
-            nestedObject: {
-              calculated: "{{e! return 1 + 5; }}",
-              boolean: "{{disabled}}",
-              nestedObject: {
-                float: "{{opacity}}",
-                bigint: "{{bigint}}",
-                notFound: "{{notFound}}",
-                notFoundCalc: "{{e! return notFound; }}",
-                array: [{ color: "{{color}} " }, { zIndex: "{{zIndex}}" }],
-                array2: "{{array}}",
-                fnResult: "{{e! return fn();}}",
-              },
-            },
-          },
-        },
-        placeholders
-      )
-    ).toEqual({
-      object: {
-        nestedObject: {
-          calculated: 6,
-          boolean: true,
-          nestedObject: {
-            float: 0.5,
-            bigint: 10n,
-            notFound: "{{notFound}}",
-            notFoundCalc: "{{e! return notFound; }}",
-            array: [{ color: "red " }, { zIndex: 10 }],
-            array2: [1, 2, 3],
-            fnResult: "success",
-          },
+  test("correctly render my.div component", () => {
+    const div = instance.render({ module: "my", type: "div" }, placeholders);
+    expect(div.tagName).toBe("DIV");
+  });
+
+  test("correctly render my.div component with props", () => {
+    const div = instance.render(
+      {
+        module: "my",
+        type: "div",
+        props: {
+          title: "My {{name}}",
+          style: "display: flex; flex-direction: column;",
         },
       },
-    });
+      placeholders,
+    );
 
-    expect(placeholders.fn).toHaveBeenCalledTimes(1);
-  });
-
-  test("returns empty string if input is empty", () => {
-    expect(replacePlaceholders("", placeholders)).toBe("");
-  });
-
-  test("returns the same string if there are no placeholders in expression", () => {
-    expect(replacePlaceholders("Hello, world!", placeholders)).toBe(
-      "Hello, world!"
+    expect(div.getAttribute("title")).toBe("My Rendero");
+    expect(div.getAttribute("style")).toBe(
+      "display: flex; flex-direction: column;",
     );
   });
 
-  test("does not replace malformed placeholders", () => {
-    expect(replacePlaceholders("{color}}", placeholders)).toBe("{color}}");
-  });
-
-  test("does not replace placeholders with spaces inside", () => {
-    expect(replacePlaceholders("{{ color }}", placeholders)).toBe(
-      "{{ color }}"
+  test("correctly render my.div component text node child", () => {
+    const div = instance.render(
+      {
+        module: "my",
+        type: "div",
+        children: [{ module: "my", type: "hello" }],
+      },
+      placeholders,
     );
+
+    expect(div.textContent).toBe("Hello, World!");
   });
 
-  test("leaves the expression unchanged if a variable is not found", () => {
-    expect(
-      replacePlaceholders("{{e! return unknownVar; }}", placeholders)
-    ).toBe("{{e! return unknownVar; }}");
+  test("correctly render my.div component span child", () => {
+    const div = instance.render(
+      {
+        module: "my",
+        type: "div",
+        children: [
+          {
+            module: "my",
+            type: "span",
+            children: [
+              { module: "my", type: "hello", props: { value: "YOU" } },
+            ],
+          },
+          {
+            module: "my",
+            type: "span",
+            children: [
+              {
+                module: "my",
+                type: "hello",
+                props: { value: "{{foo}}" },
+              },
+            ],
+          },
+        ],
+      },
+      placeholders,
+    );
+
+    expect(div.childElementCount).toBe(2);
+    expect(div.firstElementChild.tagName).toBe("SPAN");
+    expect(div.firstElementChild.textContent).toBe("Hello, YOU!");
+    expect(div.lastElementChild.tagName).toBe("SPAN");
+    expect(div.lastElementChild.textContent).toBe("Hello, bar!");
   });
 
-  test("returns null if input is null", () => {
-    expect(replacePlaceholders(null, placeholders)).toBe(null);
-  });
-
-  test("returns undefined if input is undefined", () => {
-    expect(replacePlaceholders(undefined, placeholders)).toBe(undefined);
+  test("throws error when render unknown component", () => {
+    expect(() => {
+      instance.render({ module: "my", type: "unknown" }, placeholders);
+    }).toThrowError("Wrong node type: my:unknown");
   });
 });

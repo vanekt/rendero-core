@@ -3,57 +3,47 @@ import { bindEvents, replacePlaceholders, bindFunction } from "./helpers";
 export { bindFunction };
 
 export function createInstance(...modules) {
-  const COMPONENTS = modules.reduce(
-    (result, { name, components = {} }) => {
-      return {
-        ...result,
-        [name]: components,
-        __legacy: {
-          ...result.__legacy,
-          ...components,
-        },
-      };
-    },
-    {
-      __legacy: {},
-    },
+  const components = modules.reduce(
+    (result, { name, components = {} }) => ({
+      ...result,
+      [name]: components,
+    }),
+    {},
   );
 
-  const VARS = modules.reduce(
+  const globalVars = modules.reduce(
     (result, { vars = {} }) => ({ ...result, ...vars }),
     {},
   );
 
-  const render = (node = {}, _vars = {}) => {
-    const { module, type, props, children, key = 0 } = node;
-
-    const component =
-      module && COMPONENTS[module]
-        ? COMPONENTS[module][type]
-        : COMPONENTS.__legacy[type];
+  const render = (
+    { module, type, props, children, key = 0 },
+    renderVars = {},
+  ) => {
+    const component = components?.[module]?.[type];
 
     if (!component) {
-      throw new Error(`Wrong node type: ${type}`);
+      throw new Error(`Wrong node type: ${module}:${type}`);
     }
 
-    const vars = { ...VARS, ..._vars };
+    const mergedVars = { ...globalVars, ...renderVars };
 
     return component(
       {
         key,
-        ...bindEvents(replacePlaceholders(props, vars), vars),
+        ...bindEvents(replacePlaceholders(props, mergedVars), mergedVars),
       },
       {
         children,
-        vars,
+        vars: mergedVars,
         render,
-        renderChildren: (__vars = {}) => {
+        renderChildren: (extraVars = {}) => {
           if (!Array.isArray(children)) {
-            return null;
+            return [];
           }
 
           return children.map((child, idx) =>
-            render({ ...child, key: idx }, { ..._vars, ...__vars }),
+            render({ ...child, key: idx }, { ...renderVars, ...extraVars }),
           );
         },
         replacePlaceholders,
@@ -62,8 +52,8 @@ export function createInstance(...modules) {
   };
 
   return {
-    components: COMPONENTS,
-    vars: VARS,
     render,
+    components,
+    vars: globalVars,
   };
 }
