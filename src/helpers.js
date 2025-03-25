@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 const PLACEHOLDER_START = "{{";
 const PLACEHOLDER_END = "}}";
 const PLACEHOLDER_START_TEMP = "~~";
@@ -10,7 +8,7 @@ export function replacePlaceholders(object, values) {
     return object;
   }
 
-  if (_.isString(object)) {
+  if (typeof object === "string") {
     let result = object;
     let start = result.indexOf(PLACEHOLDER_START);
 
@@ -28,7 +26,7 @@ export function replacePlaceholders(object, values) {
       if (attribute.startsWith("e!")) {
         try {
           const fn = attribute.substring(2);
-          const [k, v] = getKeysValues(_.merge(values));
+          const [k, v] = getKeysValues(values);
           /* eslint-disable-next-line */
           const fnResult = new Function(...k, fn)(...v);
           if (
@@ -47,8 +45,8 @@ export function replacePlaceholders(object, values) {
           result = result.replace(PLACEHOLDER_START, PLACEHOLDER_START_TEMP);
           result = result.replace(PLACEHOLDER_END, PLACEHOLDER_END_TEMP);
         }
-      } else if (_.has(values, attribute)) {
-        const value = _.get(values, attribute);
+      } else if (attribute in values) {
+        const value = values[attribute];
 
         if (
           typeof value !== "string" &&
@@ -73,14 +71,14 @@ export function replacePlaceholders(object, values) {
     result = result.replace(PLACEHOLDER_END_TEMP, PLACEHOLDER_END);
 
     return result;
-  } else if (_.isArray(object)) {
+  } else if (Array.isArray(object)) {
     const result = [];
     for (let item of object) {
       result.push(replacePlaceholders(item, values));
     }
 
     return result;
-  } else if (_.isPlainObject(object)) {
+  } else if (typeof object === "object") {
     const result = {};
     for (let key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key)) {
@@ -146,7 +144,7 @@ export function bindEvents(obj, vars = {}) {
     if (event in obj) {
       result[event] = (e) => {
         const { fn, args = {} } = obj[event];
-        const _args = _.merge(vars, args, { e }) || {};
+        const _args = { ...vars, ...args, e };
         const [keys, values] = getKeysValues(_args);
 
         /* eslint-disable-next-line */
@@ -159,15 +157,15 @@ export function bindEvents(obj, vars = {}) {
 }
 
 export function bindFunction(config, vars, argKeys = []) {
-  const fn = _.get(config, "fn");
+  const fn = config?.fn;
   if (!fn) {
     return;
   }
 
-  const args = _.get(config, "args") || {};
+  const args = config?.args || {};
 
   return (...argValues) => {
-    const [keys, values] = getKeysValues(_.merge(vars, args));
+    const [keys, values] = getKeysValues({ ...vars, ...args });
 
     keys.push(...argKeys);
     values.push(...argValues);

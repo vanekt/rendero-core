@@ -23,9 +23,7 @@
     "lint": "eslint src --ext .js,.jsx --config .eslintrc.cjs",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
+  "dependencies": {},
   "description": "",
   "files": [
     "dist"

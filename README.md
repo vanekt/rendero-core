@@ -14,7 +14,7 @@ A library for dynamic UI rendering based on mappers and JSON markup. It allows u
 To install the library and required dependencies, run:
 
 ```bash
-npm install lodash @vanekt/rendero-core
+npm install @vanekt/rendero-core
 ```
 
 ## Usage
@@ -113,22 +113,26 @@ const template = instance.render(json, placeholders);
 
 // Append the rendered template to the document body
 document.body.appendChild(template);
-
 ```
 
 As a result, we will get the following HTML markup:
+
 ```html
-<div key="0" id="my-div" title="My DIV" style="display: flex; flex-direction: column;">
+<div
+  key="0"
+  id="my-div"
+  title="My DIV"
+  style="display: flex; flex-direction: column;"
+>
   <span key="0" style="color: red;">Hello, Universe!</span>
   "Hello, World!"
   <script>
-  (function() {
-    new Function("vars", console.log("Hi, Rendero!"))();
-  })();
+    (function () {
+      new Function("vars", console.log("Hi, Rendero!"))();
+    })();
   </script>
 </div>
 ```
-
 
 ## Ready-to-Use Modules
 
