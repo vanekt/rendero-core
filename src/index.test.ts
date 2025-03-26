@@ -1,5 +1,5 @@
 import { describe, test, expect } from "@jest/globals";
-import { createInstance } from ".";
+import { createInstance } from "./index";
 
 function initMyModule() {
   return {

@@ -9,18 +9,28 @@
   "author": "vanekt",
   "license": "MIT",
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
     "eslint": "^9.23.0",
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "microbundle": "^0.15.1",
     "prettier": "^3.0.0",
+    "ts-jest": "^29.3.0",
+    "typescript": "^5.8.2",
     "typescript-eslint": "^8.28.0"
   },
-  "source": "src/index.js",
+  "source": "src/index.ts",
   "main": "dist/index.js",
-  "module": "dist/index.module.js",
-  "unpkg": "dist/index.umd.js",
+  "umd:main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.js",
+    "default": "./dist/index.modern.mjs"
+  },
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "microbundle",
     "format": "prettier --write 'src/**/*.{js,jsx}'",
@@ -31,8 +41,5 @@
   "description": "",
   "files": [
     "dist"
-  ],
-  "jest": {
-    "transform": {}
-  }
+  ]
 }

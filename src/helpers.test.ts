@@ -85,6 +85,7 @@ describe("replacePlaceholders function", () => {
           object: {
             nestedObject: {
               calculated: "{{e! return 1 + 5; }}",
+              stringWithCalc: "Total: {{e! return 1 + 5; }}", // TODO separate case
               boolean: "{{disabled}}",
               nestedObject: {
                 float: "{{opacity}}",
@@ -104,6 +105,7 @@ describe("replacePlaceholders function", () => {
       object: {
         nestedObject: {
           calculated: 6,
+          stringWithCalc: "Total: 6",
           boolean: true,
           nestedObject: {
             float: 0.5,

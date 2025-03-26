@@ -13,7 +13,7 @@ export function replacePlaceholders(object, values) {
     let start = result.indexOf(PLACEHOLDER_START);
 
     while (start >= 0) {
-      let end = result.indexOf(
+      const end = result.indexOf(
         PLACEHOLDER_END,
         start + PLACEHOLDER_START.length,
       );
@@ -29,8 +29,9 @@ export function replacePlaceholders(object, values) {
           const [k, v] = getKeysValues(values);
 
           const fnResult = new Function(...k, fn)(...v);
+
           if (
-            typeof value !== "string" &&
+            typeof fnResult !== "string" &&
             object === `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`
           ) {
             return fnResult;
@@ -72,14 +73,14 @@ export function replacePlaceholders(object, values) {
     return result;
   } else if (Array.isArray(object)) {
     const result = [];
-    for (let item of object) {
+    for (const item of object) {
       result.push(replacePlaceholders(item, values));
     }
 
     return result;
   } else if (typeof object === "object") {
     const result = {};
-    for (let key in object) {
+    for (const key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key)) {
         result[key] = replacePlaceholders(object[key], values);
       }
@@ -139,7 +140,7 @@ export function bindEvents(obj, vars = {}) {
 
   const result = { ...obj };
 
-  for (let event of eventList) {
+  for (const event of eventList) {
     if (event in obj) {
       result[event] = (e) => {
         const { fn, args = {} } = obj[event];
