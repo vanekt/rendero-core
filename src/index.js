@@ -16,36 +16,34 @@ export function createInstance(...modules) {
     {},
   );
 
-  const render = (
-    { module, type, props, children, key = 0 },
-    renderVars = {},
-  ) => {
+  const render = (node = {}, renderVars = {}) => {
+    const { module, type, props: nodeProps, children, key = 0 } = node || {};
     const component = components?.[module]?.[type];
 
     if (!component) {
       throw new Error(`Wrong node type: ${module}:${type}`);
     }
 
-    const mergedVars = { ...globalVars, ...renderVars };
+    const renderChildren = (extraVars = {}) => {
+      if (!Array.isArray(children)) {
+        return [];
+      }
+
+      return children.map((child, idx) =>
+        render({ ...child, key: idx }, { ...renderVars, ...extraVars }),
+      );
+    };
+
+    const vars = { ...globalVars, ...renderVars };
+    const props = bindEvents(replacePlaceholders(nodeProps, vars), vars);
 
     return component(
-      {
-        key,
-        ...bindEvents(replacePlaceholders(props, mergedVars), mergedVars),
-      },
+      { key, ...props },
       {
         children,
-        vars: mergedVars,
+        vars,
         render,
-        renderChildren: (extraVars = {}) => {
-          if (!Array.isArray(children)) {
-            return [];
-          }
-
-          return children.map((child, idx) =>
-            render({ ...child, key: idx }, { ...renderVars, ...extraVars }),
-          );
-        },
+        renderChildren,
         replacePlaceholders,
       },
     );

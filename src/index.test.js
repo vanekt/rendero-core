@@ -60,6 +60,20 @@ const secondModule = initSecondModule();
 const instance = createInstance(myModule, secondModule);
 const placeholders = { name: "Rendero" };
 
+describe("createInstance function", () => {
+  test("correctly handles empty modules array", () => {
+    const emptyInstance = createInstance();
+    expect(emptyInstance.components).toEqual({});
+    expect(emptyInstance.vars).toEqual({});
+  });
+
+  test("correctly handles modules without components or vars", () => {
+    const instance = createInstance({ name: "empty" });
+    expect(instance.components).toEqual({ empty: {} });
+    expect(instance.vars).toEqual({});
+  });
+});
+
 describe("instance.components", () => {
   test("correctly add all modules", () => {
     expect(instance.components).toHaveProperty(myModule.name);
@@ -177,5 +191,43 @@ describe("instance.render function", () => {
     expect(() => {
       instance.render({ module: "my", type: "unknown" }, placeholders);
     }).toThrowError("Wrong node type: my:unknown");
+  });
+
+  test("correctly render my.div component with incorrect children value", () => {
+    expect(
+      instance.render(
+        {
+          module: "my",
+          type: "div",
+          children: null,
+        },
+        placeholders,
+      ).childElementCount,
+    ).toBe(0);
+  });
+
+  test("throws with incorrect node value", () => {
+    expect(() => {
+      instance.render(null);
+    }).toThrowError("Wrong node type: undefined:undefined");
+    expect(() => {
+      instance.render(undefined);
+    }).toThrowError("Wrong node type: undefined:undefined");
+    expect(() => {
+      instance.render([]);
+    }).toThrowError("Wrong node type: undefined:undefined");
+  });
+
+  test("throws with incorrect child value", () => {
+    expect(() => {
+      instance.render(
+        {
+          module: "my",
+          type: "div",
+          children: [null],
+        },
+        placeholders,
+      );
+    }).toThrowError("Wrong node type: undefined:undefined");
   });
 });
