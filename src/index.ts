@@ -16,7 +16,7 @@ export function createInstance(...modules) {
     {},
   );
 
-  const render = (node, renderVars) => {
+  const render = (node, renderVars = {}) => {
     const { module, type, props: nodeProps, children, key = 0 } = node || {};
     const component = components?.[module]?.[type];
 

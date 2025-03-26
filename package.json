@@ -19,7 +19,8 @@
     "prettier": "^3.0.0",
     "ts-jest": "^29.3.0",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.28.0"
+    "typescript-eslint": "^8.28.0",
+    "vite": "^6.2.3"
   },
   "source": "src/index.ts",
   "main": "dist/index.js",
@@ -35,7 +36,9 @@
     "build": "microbundle",
     "format": "prettier --write 'src/**/*.{js,jsx}'",
     "lint": "eslint src",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --env=jsdom"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --env=jsdom",
+    "dev": "vite",
+    "build-example": "vite build"
   },
   "dependencies": {},
   "description": "",
