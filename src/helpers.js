@@ -27,7 +27,7 @@ export function replacePlaceholders(object, values) {
         try {
           const fn = attribute.substring(2);
           const [k, v] = getKeysValues(values);
-          /* eslint-disable-next-line */
+
           const fnResult = new Function(...k, fn)(...v);
           if (
             typeof value !== "string" &&
@@ -40,8 +40,7 @@ export function replacePlaceholders(object, values) {
             `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`,
             `${fnResult}`,
           );
-        } catch (e) {
-          // console.error("fnError", e);
+        } catch {
           result = result.replace(PLACEHOLDER_START, PLACEHOLDER_START_TEMP);
           result = result.replace(PLACEHOLDER_END, PLACEHOLDER_END_TEMP);
         }
@@ -147,7 +146,6 @@ export function bindEvents(obj, vars = {}) {
         const _args = { ...vars, ...args, e };
         const [keys, values] = getKeysValues(_args);
 
-        /* eslint-disable-next-line */
         return new Function(...keys, fn)(...values);
       };
     }
@@ -170,7 +168,6 @@ export function bindFunction(config, vars, argKeys = []) {
     keys.push(...argKeys);
     values.push(...argValues);
 
-    /* eslint-disable-next-line */
     return new Function(...keys, fn)(...values);
   };
 }

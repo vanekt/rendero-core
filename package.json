@@ -1,5 +1,6 @@
 {
   "name": "@vanekt/rendero-core",
+  "type": "module",
   "version": "1.0.5",
   "repository": {
     "type": "git",
@@ -8,20 +9,22 @@
   "author": "vanekt",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.46.0",
+    "eslint": "^9.23.0",
+    "globals": "^16.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "microbundle-crl": "^0.13.11",
-    "prettier": "^3.0.0"
+    "microbundle": "^0.15.1",
+    "prettier": "^3.0.0",
+    "typescript-eslint": "^8.28.0"
   },
   "source": "src/index.js",
   "main": "dist/index.js",
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "build": "microbundle-crl",
+    "build": "microbundle",
     "format": "prettier --write 'src/**/*.{js,jsx}'",
-    "lint": "eslint src --ext .js,.jsx --config .eslintrc.cjs",
+    "lint": "eslint src",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --env=jsdom"
   },
   "dependencies": {},
@@ -29,7 +32,6 @@
   "files": [
     "dist"
   ],
-  "type": "module",
   "jest": {
     "transform": {}
   }
