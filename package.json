@@ -37,7 +37,7 @@
     "format": "prettier --write 'src/**/*.{js,jsx}'",
     "lint": "eslint src",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --env=jsdom",
-    "dev": "vite",
+    "dev": "vite --open",
     "build-example": "vite build"
   },
   "dependencies": {},
