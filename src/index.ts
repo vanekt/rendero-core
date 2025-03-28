@@ -1,22 +1,44 @@
 import { bindEvents, replacePlaceholders, bindFunction } from "./helpers";
+import type {
+  Components,
+  Instance,
+  Module,
+  Node,
+  NodeProps,
+  RenderedLayout,
+  RenderResult,
+  Vars,
+} from "./types";
 
 export { bindFunction };
 
-export function createInstance(...modules) {
+// TODO
+export {
+  Components,
+  Instance,
+  Module,
+  Node,
+  NodeProps,
+  RenderedLayout,
+  RenderResult,
+  Vars,
+};
+
+export function createInstance(...modules: Module[]): Instance {
   const components = modules.reduce(
     (result, { name, components = {} }) => ({
       ...result,
       [name]: components,
     }),
-    {},
+    {} as Record<string, Components>,
   );
 
   const globalVars = modules.reduce(
     (result, { vars = {} }) => ({ ...result, ...vars }),
-    {},
+    {} as Vars,
   );
 
-  const render = (node, renderVars = {}) => {
+  const render = (node: Node, renderVars: Vars = {}): RenderResult => {
     const {
       module,
       type,
@@ -30,8 +52,9 @@ export function createInstance(...modules) {
       throw new Error(`Wrong node type: ${module}:${type}`);
     }
 
-    let children = [];
-    const renderChildren = (extraVars = {}) => {
+    let children: RenderResult[] = [];
+
+    const renderChildren = (extraVars: Vars = {}): RenderedLayout[] => {
       if (!Array.isArray(nodeChildren)) {
         return [];
       }
@@ -44,7 +67,11 @@ export function createInstance(...modules) {
     };
 
     const vars = { ...globalVars, ...renderVars };
-    const props = bindEvents(replacePlaceholders(nodeProps, vars), vars);
+
+    const props = bindEvents(
+      replacePlaceholders(nodeProps, vars),
+      vars,
+    ) as NodeProps;
 
     const layout = component(
       { key, ...props },

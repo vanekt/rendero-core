@@ -1,15 +1,20 @@
+import { NodePropValue, Vars } from "./types";
+
 const PLACEHOLDER_START = "{{";
 const PLACEHOLDER_END = "}}";
 const PLACEHOLDER_START_TEMP = "~~";
 const PLACEHOLDER_END_TEMP = "~~";
 
-export function replacePlaceholders(object, values) {
-  if (!object || !values) {
-    return object;
+export function replacePlaceholders(
+  props: NodePropValue,
+  vars: Vars,
+): NodePropValue {
+  if (!props || !vars) {
+    return props;
   }
 
-  if (typeof object === "string") {
-    let result = object;
+  if (typeof props === "string") {
+    let result = props;
     let start = result.indexOf(PLACEHOLDER_START);
 
     while (start >= 0) {
@@ -26,13 +31,13 @@ export function replacePlaceholders(object, values) {
       if (attribute.startsWith("e!")) {
         try {
           const fn = attribute.substring(2);
-          const [k, v] = getKeysValues(values);
+          const [k, v] = getKeysValues(vars);
 
           const fnResult = new Function(...k, fn)(...v);
 
           if (
             typeof fnResult !== "string" &&
-            object === `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`
+            props === `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`
           ) {
             return fnResult;
           }
@@ -45,12 +50,12 @@ export function replacePlaceholders(object, values) {
           result = result.replace(PLACEHOLDER_START, PLACEHOLDER_START_TEMP);
           result = result.replace(PLACEHOLDER_END, PLACEHOLDER_END_TEMP);
         }
-      } else if (attribute in values) {
-        const value = values[attribute];
+      } else if (attribute in vars) {
+        const value = vars[attribute];
 
         if (
           typeof value !== "string" &&
-          object === `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`
+          props === `${PLACEHOLDER_START}${attribute}${PLACEHOLDER_END}`
         ) {
           return value;
         }
@@ -71,25 +76,25 @@ export function replacePlaceholders(object, values) {
     result = result.replace(PLACEHOLDER_END_TEMP, PLACEHOLDER_END);
 
     return result;
-  } else if (Array.isArray(object)) {
+  } else if (Array.isArray(props)) {
     const result = [];
-    for (const item of object) {
-      result.push(replacePlaceholders(item, values));
+    for (const item of props) {
+      result.push(replacePlaceholders(item, vars));
     }
 
     return result;
-  } else if (typeof object === "object") {
+  } else if (typeof props === "object") {
     const result = {};
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        result[key] = replacePlaceholders(object[key], values);
+    for (const key in props) {
+      if (Object.prototype.hasOwnProperty.call(props, key)) {
+        result[key] = replacePlaceholders(props[key], vars);
       }
     }
 
     return result;
   }
 
-  return object;
+  return props;
 }
 
 const eventList = [
