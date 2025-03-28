@@ -31,5 +31,7 @@ export function renderCase(index, cases) {
     ...currentCase.modules.map((module) => module()),
   );
 
-  return instance.render(currentCase.json, currentCase.vars);
+  return instance.render(currentCase.json, currentCase.vars, {
+    __debugger: true,
+  });
 }

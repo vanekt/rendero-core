@@ -30,7 +30,7 @@ function createNode(name) {
       node.setAttributeNode(attr);
     });
 
-    node.append(...renderChildren());
+    node.append(...renderChildren({ [name]: name }));
 
     return node;
   };
