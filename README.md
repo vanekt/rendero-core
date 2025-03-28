@@ -108,11 +108,11 @@ const json = {
 // Add placeholders, they will be available in each component's props in the following format: {{name}}
 const placeholders = { name: "Rendero" };
 
-// Render the template
-const template = instance.render(json, placeholders);
+// Render the ui tree
+const result = instance.render(json, placeholders);
 
-// Append the rendered template to the document body
-document.body.appendChild(template);
+// Append the rendered layout to the document body
+document.body.appendChild(result.layout);
 ```
 
 As a result, we will get the following HTML markup:

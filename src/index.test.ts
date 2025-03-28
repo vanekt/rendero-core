@@ -109,13 +109,16 @@ describe("instance.vars", () => {
 
 describe("instance.render function", () => {
   test("correctly render my.hello component", () => {
-    expect(instance.render({ module: "my", type: "hello" }, placeholders)).toBe(
-      "Hello, World!",
-    );
+    expect(
+      instance.render({ module: "my", type: "hello" }, placeholders).layout,
+    ).toBe("Hello, World!");
   });
 
   test("correctly render my.div component", () => {
-    const div = instance.render({ module: "my", type: "div" }, placeholders);
+    const div = instance.render(
+      { module: "my", type: "div" },
+      placeholders,
+    ).layout;
     expect(div.tagName).toBe("DIV");
   });
 
@@ -130,7 +133,7 @@ describe("instance.render function", () => {
         },
       },
       placeholders,
-    );
+    ).layout;
 
     expect(div.getAttribute("title")).toBe("My Rendero");
     expect(div.getAttribute("style")).toBe(
@@ -146,7 +149,7 @@ describe("instance.render function", () => {
         children: [{ module: "my", type: "hello" }],
       },
       placeholders,
-    );
+    ).layout;
 
     expect(div.textContent).toBe("Hello, World!");
   });
@@ -178,7 +181,7 @@ describe("instance.render function", () => {
         ],
       },
       placeholders,
-    );
+    ).layout;
 
     expect(div.childElementCount).toBe(2);
     expect(div.firstElementChild.tagName).toBe("SPAN");
@@ -202,7 +205,7 @@ describe("instance.render function", () => {
           children: null,
         },
         placeholders,
-      ).childElementCount,
+      ).layout.childElementCount,
     ).toBe(0);
   });
 

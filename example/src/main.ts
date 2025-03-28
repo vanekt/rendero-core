@@ -4,8 +4,8 @@ import cases from "./cases";
 buildNavigation(cases);
 
 const search = new URLSearchParams(window.location.search);
-const { layout, debug } = renderCase(search.get("case"), cases);
+const result = renderCase(search.get("case"), cases);
 
-console.log("debug", debug);
+console.log("debug", result);
 
-document.body.appendChild(layout);
+document.body.appendChild(result.layout);
